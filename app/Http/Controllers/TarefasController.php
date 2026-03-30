@@ -20,7 +20,14 @@ class TarefasController extends Controller
 
     public function store(Request $request)
     {
-       $tarefas = Tarefas::create($request->all());
+        $request->validate([
+            'titulo' => ['required', 'string', 'max:70'],
+            'descricao' => ['nullable', 'string', 'max:200'],
+            'status' => ['required','in:pendente,em_andamento,concluida'],
+            'prioridade' => ['required','in:baixa,media,alta']
+        ]);
+
+        $tarefas = Tarefas::create($request->all());
         return redirect()->route("tarefas.index")->with("success","Tarefa foi adicionada com sucesso!");
     }
 
@@ -31,8 +38,15 @@ class TarefasController extends Controller
 
     public function update(Request $request, Tarefas $tarefas)
     {
+        $request->validate([
+            'titulo' => ['required', 'string', 'max:70'],
+            'descricao' => ['nullable', 'string', 'max:200'],
+            'status' => ['required','in:pendente,em_andamento,concluida'],
+            'prioridade' => ['required','in:baixa,media,alta']
+        ]);
+
         $tarefas->update($request->all());
-        return redirect()->route("tarefas.update")->with("success","Tarefa foi atualizada com sucesso!");
+        return redirect()->route("tarefas.index")->with("success","Tarefa foi atualizada com sucesso!");
     }
 
     public function destroy(Tarefas $tarefas)
