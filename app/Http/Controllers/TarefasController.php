@@ -7,10 +7,14 @@ use Illuminate\Http\Request;
 
 class TarefasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-       $tarefas = Tarefas::all();
-       return view("tarefas.index", compact("tarefas"));
+        $query = Tarefas::where('user_id', auth()->id());
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+        $tarefas = $query->get();
+        return view("tarefas.index", compact("tarefas"));
     }
 
     public function create()
@@ -23,35 +27,49 @@ class TarefasController extends Controller
         $request->validate([
             'titulo' => ['required', 'string', 'max:70'],
             'descricao' => ['nullable', 'string', 'max:200'],
-            'status' => ['required','in:pendente,em_andamento,concluida'],
-            'prioridade' => ['required','in:baixa,media,alta']
+            'status' => ['required', 'in:pendente,em_andamento,concluida'],
+            'prioridade' => ['required', 'in:baixa,media,alta']
         ]);
 
-        $tarefas = Tarefas::create($request->all());
-        return redirect()->route("tarefas.index")->with("success","Tarefa foi adicionada com sucesso!");
+        Tarefas::create([
+            'user_id' => auth()->id(),
+            'titulo' => $request->titulo,
+            'descricao' => $request->descricao,
+            'status' => $request->status,
+            'prioridade' => $request->prioridade,
+            'data_entrega' => $request->data_entrega,
+        ]);
+
+        return redirect()->route("tarefas.index")->with("success", "Tarefa adicionada com sucesso!");
     }
 
-    public function edit(Tarefas $tarefas)
+    public function edit(Tarefas $tarefa)
     {
-        return view("tarefas.edit", compact("tarefas"));
+        return view("tarefas.edit", compact("tarefa"));
     }
 
-    public function update(Request $request, Tarefas $tarefas)
+    public function update(Request $request, Tarefas $tarefa)
     {
         $request->validate([
             'titulo' => ['required', 'string', 'max:70'],
             'descricao' => ['nullable', 'string', 'max:200'],
-            'status' => ['required','in:pendente,em_andamento,concluida'],
-            'prioridade' => ['required','in:baixa,media,alta']
+            'status' => ['required', 'in:pendente,em_andamento,concluida'],
+            'prioridade' => ['required', 'in:baixa,media,alta']
         ]);
 
-        $tarefas->update($request->all());
-        return redirect()->route("tarefas.index")->with("success","Tarefa foi atualizada com sucesso!");
+        $tarefa->update($request->all());
+        return redirect()->route("tarefas.index")->with("success", "Tarefa atualizada com sucesso!");
     }
 
-    public function destroy(Tarefas $tarefas)
+    public function destroy(Tarefas $tarefa)
     {
-        $tarefas->delete();
-        return redirect()->route("tarefas.index")->with("success","Tarefas removida com sucesso!");
+        $tarefa->delete();
+        return redirect()->route("tarefas.index")->with("success", "Tarefa removida com sucesso!");
+    }
+
+    public function concluir(Tarefas $tarefa)
+    {
+        $tarefa->update(['status' => 'concluida']);
+        return redirect()->route('tarefas.index')->with('success', 'Tarefa concluída!');
     }
 }
