@@ -25,4 +25,5 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Rotas protegidas — só acessa se estiver logado
 Route::middleware('auth')->group(function () {
     Route::resource('tarefas', TarefasController::class);
+    Route::patch('tarefas/{tarefa}/concluir', [TarefasController::class, 'concluir'])->name('tarefas.concluir');
 });

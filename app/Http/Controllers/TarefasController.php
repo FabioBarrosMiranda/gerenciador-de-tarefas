@@ -10,11 +10,9 @@ class TarefasController extends Controller
     public function index(Request $request)
     {
         $query = Tarefas::where('user_id', auth()->id());
-
         if ($request->status) {
             $query->where('status', $request->status);
         }
-
         $tarefas = $query->get();
         return view("tarefas.index", compact("tarefas"));
     }
@@ -29,12 +27,12 @@ class TarefasController extends Controller
         $request->validate([
             'titulo' => ['required', 'string', 'max:70'],
             'descricao' => ['nullable', 'string', 'max:200'],
-            'status' => ['required','in:pendente,em_andamento,concluida'],
-            'prioridade' => ['required','in:baixa,media,alta']
+            'status' => ['required', 'in:pendente,em_andamento,concluida'],
+            'prioridade' => ['required', 'in:baixa,media,alta']
         ]);
 
-        Terefas::create([
-            'user_id'=> auth()->id(),
+        Tarefas::create([
+            'user_id' => auth()->id(),
             'titulo' => $request->titulo,
             'descricao' => $request->descricao,
             'status' => $request->status,
@@ -55,17 +53,23 @@ class TarefasController extends Controller
         $request->validate([
             'titulo' => ['required', 'string', 'max:70'],
             'descricao' => ['nullable', 'string', 'max:200'],
-            'status' => ['required','in:pendente,em_andamento,concluida'],
-            'prioridade' => ['required','in:baixa,media,alta']
+            'status' => ['required', 'in:pendente,em_andamento,concluida'],
+            'prioridade' => ['required', 'in:baixa,media,alta']
         ]);
 
         $tarefa->update($request->all());
-        return redirect()->route("tarefas.index")->with("success","Tarefa foi atualizada com sucesso!");
+        return redirect()->route("tarefas.index")->with("success", "Tarefa atualizada com sucesso!");
     }
 
     public function destroy(Tarefas $tarefa)
     {
         $tarefa->delete();
-        return redirect()->route("tarefas.index")->with("success","Tarefas removida com sucesso!");
+        return redirect()->route("tarefas.index")->with("success", "Tarefa removida com sucesso!");
+    }
+
+    public function concluir(Tarefas $tarefa)
+    {
+        $tarefa->update(['status' => 'concluida']);
+        return redirect()->route('tarefas.index')->with('success', 'Tarefa concluída!');
     }
 }

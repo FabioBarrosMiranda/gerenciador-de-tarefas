@@ -6,19 +6,18 @@
         <a href="{{ route('tarefas.create') }}" class="btn btn-primary">+ Nova Tarefa</a>
     </div>
 
+    <form method="GET" action="{{ route('tarefas.index') }}" class="mb-3">
+        <div class="d-flex gap-2">
+            <select name="status" class="form-control w-auto">
+                <option value="">Todos</option>
+                <option value="pendente" {{ request('status') == 'pendente' ? 'selected' : '' }}>Pendente</option>
+                <option value="em_andamento" {{ request('status') == 'em_andamento' ? 'selected' : '' }}>Em andamento</option>
+                <option value="concluida" {{ request('status') == 'concluida' ? 'selected' : '' }}>Concluída</option>
+            </select>
+            <button type="submit" class="btn btn-secondary">Filtrar</button>
+        </div>
+    </form>
 
-<form method="GET" action="{{ route('tarefas.index') }}" class="mb-3">
-    <div class="d-flex gap-2">
-        <select name="status" class="form-control w-auto">
-            <option value="">Todos</option>
-            <option value="pendente" {{ request('status') == 'pendente' ? 'selected' : '' }}>Pendente</option>
-            <option value="em_andamento" {{ request('status') == 'em_andamento' ? 'selected' : '' }}>Em andamento</option>
-            <option value="concluida" {{ request('status') == 'concluida' ? 'selected' : '' }}>Concluída</option>
-        </select>
-        <button type="submit" class="btn btn-secondary">Filtrar</button>
-    </div>
-</form>
-    
     <table class="table table-bordered table-hover bg-white">
         <thead class="table-dark">
             <tr>
@@ -38,6 +37,14 @@
                     <td>{{ $tarefa->data_entrega ?? '—' }}</td>
                     <td>
                         <a href="{{ route('tarefas.edit', $tarefa->id) }}" class="btn btn-sm btn-warning">Editar</a>
+
+                        @if($tarefa->status != 'concluida')
+                            <form action="{{ route('tarefas.concluir', $tarefa->id) }}" method="POST" style="display:inline">
+                                @csrf
+                                @method('PATCH')
+                                <button class="btn btn-sm btn-success">Concluir</button>
+                            </form>
+                        @endif
 
                         <form action="{{ route('tarefas.destroy', $tarefa->id) }}" method="POST" style="display:inline">
                             @csrf
