@@ -7,6 +7,18 @@
     </div>
 
 
+<form method="GET" action="{{ route('tarefas.index') }}" class="mb-3">
+    <div class="d-flex gap-2">
+        <select name="status" class="form-control w-auto">
+            <option value="">Todos</option>
+            <option value="pendente" {{ request('status') == 'pendente' ? 'selected' : '' }}>Pendente</option>
+            <option value="em_andamento" {{ request('status') == 'em_andamento' ? 'selected' : '' }}>Em andamento</option>
+            <option value="concluida" {{ request('status') == 'concluida' ? 'selected' : '' }}>Concluída</option>
+        </select>
+        <button type="submit" class="btn btn-secondary">Filtrar</button>
+    </div>
+</form>
+    
     <table class="table table-bordered table-hover bg-white">
         <thead class="table-dark">
             <tr>
